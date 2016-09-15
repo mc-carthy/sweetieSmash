@@ -28,4 +28,46 @@ public class MatchChecker {
 	public static bool AreHorizontalOrVerticalNeighbours (Candy c0, Candy c1) {
 		return (c0.column == c1.column || c0.row == c1.row) && Mathf.Abs (c0.column - c1.column) <= 1 && Mathf.Abs (c0.row - c1.row) <= 1;
 	}
+
+	public static IEnumerable<GameObject> GetPotentialMatches (CandyArray candies) {
+		List<List<GameObject>> matches = new List<List<GameObject>> ();
+
+
+
+		return null;
+	}
+
+	public static List<GameObject> CheckHorizontal0 (int row, int column, CandyArray candies) {
+
+		if (column <= GameVariables.columns - 2) {
+
+			if (candies [row, column].GetComponent<Candy> ().IsSameType (candies [row, column + 1].GetComponent<Candy>())) {
+
+				if (row >= 1 && column >= 1) {
+
+					if (candies [row, column].GetComponent<Candy> ().IsSameType (candies [row - 1, column - 1].GetComponent<Candy> ())) {
+						return new List<GameObject> {
+							candies [row, column],
+							candies [row, column + 1],
+							candies [row - 1, column - 1]
+						};
+					}
+
+					if (candies [row, column].GetComponent<Candy> ().IsSameType (candies [row + 1, column - 1].GetComponent<Candy> ())) {
+						return new List<GameObject> {
+							candies [row, column],
+							candies [row, column + 1],
+							candies [row + 1, column - 1]
+						};
+					}
+
+				}
+
+			}
+
+		}
+
+		return null;
+
+	}
 }
