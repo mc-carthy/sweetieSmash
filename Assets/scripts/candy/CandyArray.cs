@@ -159,4 +159,58 @@ public class CandyArray {
 		candies [item.GetComponent<Candy> ().row, item.GetComponent<Candy> ().column] = null;
 	}
 
+	public AlteredCandyInfo Collapse (IEnumerable<int> columns) {
+
+		AlteredCandyInfo collapseInfo = new AlteredCandyInfo ();
+
+		foreach (int column in columns) {
+			for (int row0 = 0; row0 < GameVariables.rows - 1; row0++) {
+				if (candies [row0, column] == null) {
+
+					for (int row1 = row0 + 1; row1 < GameVariables.rows; row1++) {
+
+						if (candies [row1, column] != null) {
+							candies [row0, column] = candies [row1, column];
+							candies [row1, column] = null;
+
+							if (row1 - row0 > collapseInfo.maxDistance) {
+
+								collapseInfo.maxDistance = row1 - row0;
+
+							}
+
+							candies [row0, column].GetComponent<Candy> ().row = row0;
+							candies [row0, column].GetComponent<Candy> ().column= column;
+
+							collapseInfo.AddCandy (candies [row0, column]);
+							break;
+
+						}
+
+					}
+
+				}
+			}
+		}
+
+		return collapseInfo;
+
+	}
+
+	public IEnumerable<CandyInfo> GetEmptyItemsOnColumn (int column) {
+
+		List<CandyInfo> emptyItems = new List<CandyInfo> ();
+
+		for (int row = 0; row < GameVariables.rows; row++) {
+
+			if (candies [row, column] == null) {
+				emptyItems.Add (new CandyInfo() { _row = row, _column = column });
+			}
+
+		}
+
+		return emptyItems;
+
+	}
+
 }
