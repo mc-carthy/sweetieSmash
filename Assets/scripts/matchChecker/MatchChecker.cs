@@ -12,7 +12,7 @@ public class MatchChecker {
 				c.a = i;
 				item.GetComponent<SpriteRenderer> ().color = c;
 			}
-			yield return new WaitForSeconds (GameVariables.OpacityAnimationDelay);
+			yield return new WaitForSeconds (GameVariables.opacityAnimationDelay);
 		}
 
 		for (float i = 0.3f; i <= 1.0f; i += 0.1f) {
@@ -21,7 +21,7 @@ public class MatchChecker {
 				c.a = i;
 				item.GetComponent<SpriteRenderer> ().color = c;
 			}
-			yield return new WaitForSeconds (GameVariables.OpacityAnimationDelay);
+			yield return new WaitForSeconds (GameVariables.opacityAnimationDelay);
 		}
 	}
 
