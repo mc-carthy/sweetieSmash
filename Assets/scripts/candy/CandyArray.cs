@@ -213,4 +213,52 @@ public class CandyArray {
 
 	}
 
+	public MatchesInfo GetMatches (GameObject go) {
+
+		MatchesInfo matchesInfo = new MatchesInfo ();
+
+		IEnumerable<GameObject> horizontalMatches = GetMatchesHorizontally (go);
+
+		if (ContainsDestroyWholeRowColumnBonus(horizontalMatches)) {
+
+			horizontalMatches = GetEntireRow(go);
+
+			if (!BonusTypeChecker.ContainsDestroyWholeRowColumn (matchesInfo.bonusesContained)) {
+				matchesInfo.bonusesContained = BonusType.DestroyWholeRowColumn;
+			}
+
+		}
+		matchesInfo.AddObjectRange (horizontalMatches);
+
+		IEnumerable<GameObject> verticalMatches = GetMatchesVertically (go);
+
+		if (ContainsDestroyWholeRowColumnBonus(verticalMatches)) {
+
+			verticalMatches = GetEntireColumn(go);
+
+			if (!BonusTypeChecker.ContainsDestroyWholeRowColumn (matchesInfo.bonusesContained)) {
+				matchesInfo.bonusesContained = BonusType.DestroyWholeRowColumn;
+			}
+
+		}
+		matchesInfo.AddObjectRange (verticalMatches);
+
+		return matchesInfo;
+
+	}
+
+	public IEnumerable<GameObject> GetMatches (IEnumerable<GameObject> gos) {
+
+		List<GameObject> matches = new List<GameObject> ();
+
+		foreach (GameObject go in gos) {
+
+			matches.AddRange (GetMatches (go).MatchedCandy);
+
+		}
+
+		return matches.Distinct ();
+
+	}
+
 }
