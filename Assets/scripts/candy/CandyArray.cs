@@ -117,4 +117,46 @@ public class CandyArray {
 		return matches.Distinct ();
 	}
 
+	private bool ContainsDestroyWholeRowColumnBonus (IEnumerable<GameObject> matches) {
+		if (matches.Count() >= GameVariables.minumumMatches) {
+			
+			foreach (GameObject item in matches) {
+				if (BonusTypeChecker.ContainsDestroyWholeRowColumn (item.GetComponent<Candy> ().bonus)) {
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+
+	private IEnumerable<GameObject> GetEntireRow (GameObject go) {
+		List<GameObject> matches = new List<GameObject> ();
+
+		int row = go.GetComponent<Candy> ().row;
+
+		for (int column = 0; column < GameVariables.columns; column++) {
+			matches.Add (candies [row, column]);
+		}
+
+		return matches;
+	}
+
+	private IEnumerable<GameObject> GetEntireColumn (GameObject go) {
+		List<GameObject> matches = new List<GameObject> ();
+
+		int column = go.GetComponent<Candy> ().column;
+
+		for (int row = 0; row < GameVariables.rows; row++) {
+			matches.Add (candies [row, column]);
+		}
+
+		return matches;
+	}
+
+	public void Remove (GameObject item) {
+		candies [item.GetComponent<Candy> ().row, item.GetComponent<Candy> ().column] = null;
+	}
+
 }
