@@ -26,6 +26,6 @@ public class MatchChecker {
 	}
 
 	public static bool AreHorizontalOrVerticalNeighbours (Candy c0, Candy c1) {
-		return (c0.column == c1.column || c0.row == c1.row) && Mathf.Abs(c0.column - c1.column) <= 1 && Mathf.Abs(c0.row - c1.row) <= 1
+		return (c0.column == c1.column || c0.row == c1.row) && Mathf.Abs (c0.column - c1.column) <= 1 && Mathf.Abs (c0.row - c1.row) <= 1;
 	}
 }
