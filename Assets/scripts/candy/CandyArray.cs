@@ -47,4 +47,74 @@ public class CandyArray {
 		Swap (backup0, backup1);
 	}
 
+	private IEnumerable<GameObject> GetMatchesHorizontally (GameObject go) {
+		List<GameObject> matches = new List<GameObject> ();
+		matches.Add (go);
+
+		Candy candy = go.GetComponent<Candy> ();
+
+		// Search for matches to the left
+		if (candy.column != 0) {
+			for (int column = candy.column - 1; column >= 0; column--) {
+				if (candies [candy.row, column].GetComponent<Candy> ().IsSameType (candy)) {
+					matches.Add (candies [candy.row, column]);
+				} else {
+					break;
+				}
+			}
+		}
+
+		// Search for matches to the right
+		if (candy.column != GameVariables.columns - 1) {
+			for (int column = candy.column + 1; column < GameVariables.columns; column++) {
+				if (candies [candy.row, column].GetComponent<Candy> ().IsSameType (candy)) {
+					matches.Add (candies [candy.row, column]);
+				} else {
+					break;
+				}
+			}
+		}
+
+		if (matches.Count < GameVariables.minumumMatches) {
+			matches.Clear ();
+		}
+
+		return matches.Distinct ();
+	}
+
+	private IEnumerable<GameObject> GetMatchesVertically (GameObject go) {
+		List<GameObject> matches = new List<GameObject> ();
+		matches.Add (go);
+
+		Candy candy = go.GetComponent<Candy> ();
+
+		// Search for matches below
+		if (candy.row != 0) {
+			for (int row = candy.row - 1; row >= 0; row--) {
+				if (candies [row, candy.column].GetComponent<Candy> ().IsSameType (candy)) {
+					matches.Add (candies [row, candy.column]);
+				} else {
+					break;
+				}
+			}
+		}
+
+		// Search for matches above
+		if (candy.row != GameVariables.rows - 1) {
+			for (int row = candy.row + 1; row < GameVariables.rows; row++) {
+				if (candies [row, candy.column].GetComponent<Candy> ().IsSameType (candy)) {
+					matches.Add (candies [row, candy.column]);
+				} else {
+					break;
+				}
+			}
+		}
+
+		if (matches.Count < GameVariables.minumumMatches) {
+			matches.Clear ();
+		}
+
+		return matches.Distinct ();
+	}
+
 }
