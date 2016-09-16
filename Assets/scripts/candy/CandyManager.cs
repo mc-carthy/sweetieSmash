@@ -224,4 +224,45 @@ public class CandyManager : MonoBehaviour {
 		bonusCandy.Initialize (hitGoCache.type, hitGoCache.row, hitGoCache.column);
 		bonusCandy.bonus = BonusType.DestroyWholeRowColumn;
 	}
+
+	private AlteredCandyInfo CreateNewCandyInSpecificColumns (IEnumerable<int> columnsWithMissingCandies) {
+
+		AlteredCandyInfo newCandyInfo = new AlteredCandyInfo ();
+
+		foreach (int column in columnsWithMissingCandies) {
+
+			IEnumerable<CandyInfo> emptyItems = candies.GetEmptyItemsOnColumn (column);
+
+			// Double check if type is Candy
+			foreach (CandyInfo item in emptyItems) {
+
+				GameObject go = GetRandomCandy ();
+				GameObject newCandy = Instantiate (go, spawnPositions [column], Quaternion.identity) as GameObject;
+				newCandy.GetComponent<Candy> ().Initialize (go.GetComponent<Candy> ().type, item._row, item._column);
+
+				if (GameVariables.rows - item._row > newCandyInfo.maxDistance) {
+					newCandyInfo.maxDistance = GameVariables.rows - item._row;
+				}
+
+				candies [item._row, item._column] = newCandy;
+				newCandyInfo.AddCandy (newCandy);
+
+			}
+
+		}
+
+		return newCandyInfo;
+
+	}
+
+	private void MoveAndAnimate (IEnumerable<GameObject> movedGameObjects, int distance) {
+
+		foreach (GameObject item in movedGameObjects) {
+			item.transform.positionTo (
+				GameVariables.moveAnimationDuration * distance, 
+				bottomRight + new Vector2(item.GetComponent<Candy>().column * candySize.x, item.GetComponent<Candy>().row * candySize.y)
+			);
+		}
+
+	}
 }
