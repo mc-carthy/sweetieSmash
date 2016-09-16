@@ -182,4 +182,46 @@ public class CandyManager : MonoBehaviour {
 		}
 	}
 
+	private void FixSortingLayer (GameObject hitGo0, GameObject hitGo1) {
+
+		SpriteRenderer sp0 = hitGo0.GetComponent<SpriteRenderer> ();
+		SpriteRenderer sp1 = hitGo1.GetComponent<SpriteRenderer> ();
+
+		if (sp0.sortingOrder <= sp1.sortingOrder) {
+			sp0.sortingOrder = 1;
+			sp1.sortingOrder = 0;
+		}
+
+	}
+
+	private void RemoveFromScene (GameObject item) {
+
+		GameObject explosion = Instantiate (GetRandomExplosion (), item.transform.position, Quaternion.identity) as GameObject;
+		Destroy (explosion, GameVariables.explosionAnimationDuration);
+		Destroy (item);
+
+	}
+
+	private GameObject GetBonusFromType (string type) {
+		string color = type.Split ('_') [1].Trim ();
+
+		foreach (GameObject item in bonusPrefabs) {
+			if (item.GetComponent<Candy> ().type.Contains (color)) {
+				return item;
+			}
+		} throw new System.Exception ("You passed the wrong type");
+	}
+
+	private void CreateBonus (Candy hitGoCache) {
+		GameObject bonus = Instantiate (
+			GetBonusFromType(hitGoCache.type), 
+			bottomRight + new Vector2(hitGoCache.column * candySize.x, hitGoCache.row * candySize.y), 
+			Quaternion.identity) as GameObject;
+
+		candies [hitGoCache.row, hitGoCache.column] = bonus;
+
+		Candy bonusCandy = bonus.GetComponent<Candy> ();
+		bonusCandy.Initialize (hitGoCache.type, hitGoCache.row, hitGoCache.column);
+		bonusCandy.bonus = BonusType.DestroyWholeRowColumn;
+	}
 }
