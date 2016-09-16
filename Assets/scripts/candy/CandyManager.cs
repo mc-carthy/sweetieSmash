@@ -26,6 +26,40 @@ public class CandyManager : MonoBehaviour {
 	private void Start () {
 		InitializeTypesOnPrefabShapesAndBonuses ();
 		InitializeCandyAndSpawnPositions ();
+		StartCheckForPotentialMatches ();
+	}
+
+	private void Update () {
+
+		if (state == GameState.None) {
+			if (Input.GetMouseButtonDown (0)) {
+				RaycastHit2D hit = Physics2D.Raycast (Camera.main.ScreenToWorldPoint (Input.mousePosition), Vector2.zero);
+
+				if (hit.collider != null) {
+					hitGo0 = hit.collider.gameObject;
+					state = GameState.SelectionStarted;
+				}
+			}
+		} else if (state == GameState.SelectionStarted) {
+			if (Input.GetMouseButtonDown (0)) {
+				RaycastHit2D hit = Physics2D.Raycast (Camera.main.ScreenToWorldPoint (Input.mousePosition), Vector2.zero);
+
+				if (hit.collider != null && hitGo0 != hit.collider.gameObject) {
+					StopCheckForPotentialMatches ();
+
+					if (MatchChecker.AreHorizontalOrVerticalNeighbours (hitGo0.GetComponent<Candy> (), hit.collider.gameObject.GetComponent<Candy> ())) {
+
+						state = GameState.Animating;
+						FixSortingLayer (hitGo0, hit.collider.gameObject);
+						StartCoroutine (FindMatchesAndCollapse (hit));
+
+					} else {
+						state = GameState.None;
+					}
+				}
+			}
+		}
+
 	}
 
 	private void InitializeVariables () {
@@ -34,11 +68,12 @@ public class CandyManager : MonoBehaviour {
 	}
 
 	private void ShowScore () {
-		scoreText.text = "Score: " + score;
+		scoreText.text = "Score: " + score.ToString ();
 	}
 
 	private void IncreaseScore (int value) {
 		score += value;
+		ShowScore ();
 	}
 
 	private void DestroyAllCandy () {
@@ -306,8 +341,8 @@ public class CandyManager : MonoBehaviour {
 
 		while (totalMatches.Count () >= GameVariables.minumumMatches) {
 
-			IncreaseScore(totalMatches.Count () - 2 * GameVariables.match3Score);
-
+			IncreaseScore((totalMatches.Count () - 2) * GameVariables.match3Score);
+			print ((totalMatches.Count () - 2) * GameVariables.match3Score);
 			if (timesRun >= 2) {
 				IncreaseScore (GameVariables.subsequelMatchScore);
 			}
