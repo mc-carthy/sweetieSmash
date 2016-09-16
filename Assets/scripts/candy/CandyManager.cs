@@ -16,12 +16,17 @@ public class CandyManager : MonoBehaviour {
 	private GameState state = GameState.None;
 	private GameObject hitGo = null;
 	private Vector2[] spawnPositions;
-	private GameObject[] candyPrefabs;
-	private GameObject[] explosionPrefabs;
-	private GameObject[] bonusPrefabs;
+	public GameObject[] candyPrefabs;
+	public GameObject[] explosionPrefabs;
+	public GameObject[] bonusPrefabs;
 	private IEnumerator checkPotentialMatchesCoroutine;
 	private IEnumerator animatePotentialMatchesCoroutine;
 	private IEnumerable<GameObject> potentialMatches;
+
+	private void Start () {
+		InitializeTypesOnPrefabShapesAndBonuses ();
+		InitializeCandyAndSpawnPositions ();
+	}
 
 	private void InitializeVariables () {
 		score = 0;
@@ -80,6 +85,48 @@ public class CandyManager : MonoBehaviour {
 
 	private GameObject GetRandomExplosion () {
 		return explosionPrefabs [Random.Range (0, explosionPrefabs.Length)];
+	}
+
+	public void InitializeCandyAndSpawnPositions () {
+		InitializeVariables ();
+
+		if (candies != null) {
+			DestroyAllCandy ();
+		}
+
+		candies = new CandyArray ();
+
+		spawnPositions = new Vector2 [GameVariables.columns];
+
+		for (int row = 0; row < GameVariables.rows; row++) {
+			for (int column = 0; column < GameVariables.columns; column++) {
+				GameObject newCandy = GetRandomCandy ();
+
+				while (
+					column >= 2 && 
+					candies [row, column - 1].GetComponent<Candy> ().IsSameType (newCandy.GetComponent<Candy> ()) && 
+					candies [row, column - 2].GetComponent<Candy> ().IsSameType (newCandy.GetComponent<Candy> ())) 
+				{
+					newCandy = GetRandomCandy ();
+
+				}
+
+				while (
+					row >= 2 && 
+					candies [row - 1, column].GetComponent<Candy> ().IsSameType (newCandy.GetComponent<Candy> ()) && 
+					candies [row - 2, column].GetComponent<Candy> ().IsSameType (newCandy.GetComponent<Candy> ())) 
+				{
+					newCandy = GetRandomCandy ();
+
+				}
+
+				InstantiateAndPlaceNewCandy (row, column, newCandy);
+
+			}
+		}
+
+		SetUpSpawnPositions ();
+
 	}
 
 }
