@@ -32,7 +32,31 @@ public class MatchChecker {
 	public static IEnumerable<GameObject> GetPotentialMatches (CandyArray candies) {
 		List<List<GameObject>> matches = new List<List<GameObject>> ();
 
+		for (int row = 0; row < GameVariables.rows; row++) {
+			for (int column = 0; column < GameVariables.columns; column++) {
+				List<GameObject> matches0 = CheckHorizontal0 (row, column, candies);
+				List<GameObject> matches1 = CheckHorizontal1 (row, column, candies);
+				List<GameObject> matches2 = CheckHorizontal2 (row, column, candies);				
+				List<GameObject> matches3 = CheckVertical0 (row, column, candies);
+				List<GameObject> matches4 = CheckVertical1 (row, column, candies);
+				List<GameObject> matches5 = CheckVertical2 (row, column, candies);
 
+				if (matches0 != null) {	matches.Add (matches0); }
+				if (matches1 != null) {	matches.Add (matches1); }
+				if (matches2 != null) {	matches.Add (matches2); }
+				if (matches3 != null) {	matches.Add (matches3); }
+				if (matches4 != null) {	matches.Add (matches4); }
+				if (matches5 != null) {	matches.Add (matches5); }
+
+				if (matches.Count >= 3) {
+					return matches[Random.Range(0, matches.Count - 1)];
+				}
+
+				if (row >= GameVariables.rows / 2 && matches.Count > 0 && matches.Count <= 2) {
+					return matches[Random.Range(0, matches.Count - 1)];
+				}
+			}
+		}
 
 		return null;
 	}
@@ -219,7 +243,40 @@ public class MatchChecker {
 
 	public static List<GameObject> CheckVertical2 (int row, int column, CandyArray candies) {
 
-		return null;
+		if (row <= GameVariables.rows - 4) {
 
+			if (
+				candies [row, column].GetComponent<Candy> ().IsSameType (candies [row + 1, column].GetComponent<Candy>()) &&
+				candies [row, column].GetComponent<Candy> ().IsSameType (candies [row + 3, column].GetComponent<Candy>())
+			) {
+
+				return new List<GameObject> {
+					candies [row, column],
+					candies [row + 1, column],
+					candies [row + 3, column]
+				};
+
+			}
+
+		}
+
+		if (row >= 2 && row <= GameVariables.rows - 2) {
+
+			if (
+				candies [row, column].GetComponent<Candy> ().IsSameType (candies [row + 1, column].GetComponent<Candy>()) &&
+				candies [row, column].GetComponent<Candy> ().IsSameType (candies [row - 2, column].GetComponent<Candy>())
+			) {
+
+				return new List<GameObject> {
+					candies [row, column],
+					candies [row + 1, column],
+					candies [row - 2, column]
+				};
+
+			}
+
+		}
+
+		return null;
 	}
 }
