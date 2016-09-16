@@ -14,7 +14,7 @@ public class CandyManager : MonoBehaviour {
 	private Vector2 bottomRight = new Vector2 (-2.37f, -4.27f);
 	private Vector2 candySize = new Vector2 (0.7f, 0.7f);
 	private GameState state = GameState.None;
-	private GameObject hitGo = null;
+	private GameObject hitGo0 = null;
 	private Vector2[] spawnPositions;
 	public GameObject[] candyPrefabs;
 	public GameObject[] explosionPrefabs;
@@ -263,6 +263,87 @@ public class CandyManager : MonoBehaviour {
 				bottomRight + new Vector2(item.GetComponent<Candy>().column * candySize.x, item.GetComponent<Candy>().row * candySize.y)
 			);
 		}
+	}
 
+	private IEnumerator FindMatchesAndCollapse (RaycastHit2D hit1) {
+		GameObject hitGo1 = hit1.collider.gameObject;
+		candies.Swap (hitGo0, hitGo1);
+
+		hitGo0.transform.positionTo (GameVariables.animationDuration, hit1.transform.position);
+		hitGo1.transform.positionTo (GameVariables.animationDuration, hitGo0.transform.position);
+		yield return new WaitForSeconds (GameVariables.animationDuration);
+
+		MatchesInfo hitGo0MatchesInfo = candies.GetMatches (hitGo0);
+		MatchesInfo hitGo1MatchesInfo = candies.GetMatches (hitGo1);
+
+		IEnumerable<GameObject> totalMatches = hitGo0MatchesInfo.MatchedCandy.Union (hitGo1MatchesInfo.MatchedCandy).Distinct ();
+
+		if (totalMatches.Count () < GameVariables.minumumMatches) {
+
+			hitGo0.transform.positionTo (GameVariables.animationDuration, hitGo1.transform.position);
+			hitGo1.transform.localPositionTo (GameVariables.animationDuration, hitGo0.transform.position);
+			yield return new WaitForSeconds (GameVariables.animationDuration);
+
+			candies.UndoSwap ();
+		}
+
+		bool addBonus = 
+			totalMatches.Count () >= GameVariables.minumumMatchesForBonus &&
+			!BonusTypeChecker.ContainsDestroyWholeRowColumn (hitGo0MatchesInfo.bonusesContained) &&
+			!BonusTypeChecker.ContainsDestroyWholeRowColumn (hitGo1MatchesInfo.bonusesContained);
+
+		Candy hitGo0Cache = null;
+
+		if (addBonus) {
+			hitGo0Cache = new Candy ();
+			GameObject sameTypeGo = hitGo0MatchesInfo.MatchedCandy.Count () > 0 ? hitGo0 : hitGo1;
+			Candy candy = sameTypeGo.GetComponent<Candy> ();
+
+			hitGo0Cache.Initialize (candy.type, candy.row, candy.column);
+		}
+			
+		int timesRun = 1;
+
+		while (totalMatches.Count () >= GameVariables.minumumMatches) {
+
+			IncreaseScore(totalMatches.Count () - 2 * GameVariables.match3Score);
+
+			if (timesRun >= 2) {
+				IncreaseScore (GameVariables.subsequelMatchScore);
+			}
+			soundManager.PlaySound ();
+
+			foreach (GameObject item in totalMatches) {
+				candies.Remove (item);
+				RemoveFromScene (item);
+			}
+
+			if (addBonus) {
+				CreateBonus (hitGo0Cache);
+			}
+
+			addBonus = false;
+
+			IEnumerable<int> columns = totalMatches.Select (go => go.GetComponent<Candy> ().column).Distinct ();
+
+			AlteredCandyInfo collapsedCandyInfo = candies.Collapse (columns);
+
+			AlteredCandyInfo newCandyInfo = CreateNewCandyInSpecificColumns (columns);
+
+			int maxDistance = Mathf.Max (collapsedCandyInfo.maxDistance, newCandyInfo.maxDistance);
+
+			MoveAndAnimate (newCandyInfo.AlteredCandy, maxDistance);
+			MoveAndAnimate (collapsedCandyInfo.AlteredCandy, maxDistance);
+
+			yield return new WaitForSeconds (GameVariables.moveAnimationDuration * maxDistance);
+
+			totalMatches = candies.GetMatches (collapsedCandyInfo.AlteredCandy).Union (candies.GetMatches (newCandyInfo.AlteredCandy)).Distinct ();
+
+			timesRun++;
+
+		}
+
+		state = GameState.None;
+		StartCheckForPotentialMatches ();
 	}
 }
