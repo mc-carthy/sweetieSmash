@@ -129,4 +129,57 @@ public class CandyManager : MonoBehaviour {
 
 	}
 
+	private void StartCheckForPotentialMatches () {
+		StopCheckForPotentialMatches ();
+
+		checkPotentialMatchesCoroutine = CheckForPotentialMatches ();
+		StartCoroutine (checkPotentialMatchesCoroutine);
+	}
+
+	private void StopCheckForPotentialMatches () {
+
+		if (animatePotentialMatchesCoroutine != null) {
+			StopCoroutine (animatePotentialMatchesCoroutine);
+		}
+
+		if (checkPotentialMatchesCoroutine != null) {
+			StopCoroutine (checkPotentialMatchesCoroutine);
+		}
+
+		ResetOpacityOnPotentialMatches ();
+
+	}
+
+	private void ResetOpacityOnPotentialMatches () {
+
+		if (potentialMatches != null) {
+
+			foreach (GameObject item in potentialMatches) {
+				if (item != null) {
+					Color c = item.GetComponent<SpriteRenderer> ().color;
+					c.a = 1;
+					item.GetComponent<SpriteRenderer> ().color = c;
+				}
+			}
+
+		}
+
+	}
+
+	private IEnumerator CheckForPotentialMatches () {
+		yield return new WaitForSeconds (GameVariables.waitBeforePotentialMatchesCheck);
+
+		potentialMatches = MatchChecker.GetPotentialMatches (candies);
+
+		if (potentialMatches != null) {
+
+			while (true) {
+				animatePotentialMatchesCoroutine = MatchChecker.AnimatePotentialMatches(potentialMatches);
+				StartCoroutine (animatePotentialMatchesCoroutine);
+				yield return new WaitForSeconds (GameVariables.waitBeforePotentialMatchesCheck);
+			}
+
+		}
+	}
+
 }
