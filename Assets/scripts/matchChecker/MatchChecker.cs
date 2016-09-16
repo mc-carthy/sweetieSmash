@@ -148,4 +148,78 @@ public class MatchChecker {
 		return null;
 
 	}
+
+	public static List<GameObject> CheckVertical0 (int row, int column, CandyArray candies) {
+
+		if (row <= GameVariables.rows - 2) {
+
+			if (candies [row, column].GetComponent<Candy> ().IsSameType (candies [row + 1, column].GetComponent<Candy>())) {
+
+				if (column >= 1 && row >= 1) {
+					if (candies [row, column].GetComponent<Candy> ().IsSameType (candies [row - 1, column - 1].GetComponent<Candy> ())) {
+						return new List<GameObject> {
+							candies [row, column],
+							candies [row + 1, column],
+							candies [row - 1, column - 1]
+						};
+					}
+				}
+
+				if (column <= GameVariables.columns - 2 && row >= 1) {
+					if (candies [row, column].GetComponent<Candy> ().IsSameType (candies [row - 1, column + 1].GetComponent<Candy> ())) {
+						return new List<GameObject> {
+							candies [row, column],
+							candies [row + 1, column],
+							candies [row - 1, column + 1]
+						};
+					}
+				}
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+	public static List<GameObject> CheckVertical1 (int row, int column, CandyArray candies) {
+
+		if (row <= GameVariables.rows - 3) {
+
+			if (candies [row, column].GetComponent<Candy> ().IsSameType (candies [row + 1, column].GetComponent<Candy>())) {
+
+				if (column >= 1) {
+					if (candies [row, column].GetComponent<Candy> ().IsSameType (candies [row + 2, column - 1].GetComponent<Candy> ())) {
+						return new List<GameObject> {
+							candies [row, column],
+							candies [row + 1, column],
+							candies [row + 2, column - 1]
+						};
+					}
+				}
+
+				if (column <= GameVariables.columns - 2) {
+					if (candies [row, column].GetComponent<Candy> ().IsSameType (candies [row + 2, column + 1].GetComponent<Candy> ())) {
+						return new List<GameObject> {
+							candies [row, column],
+							candies [row + 1, column],
+							candies [row + 2, column + 1]
+						};
+					}
+				}
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+	public static List<GameObject> CheckVertical2 (int row, int column, CandyArray candies) {
+
+		return null;
+
+	}
 }
