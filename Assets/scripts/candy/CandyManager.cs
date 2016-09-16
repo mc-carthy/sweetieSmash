@@ -44,4 +44,42 @@ public class CandyManager : MonoBehaviour {
 		}
 	}
 
+	private void InitializeTypesOnPrefabShapesAndBonuses () {
+
+		foreach (GameObject item in candyPrefabs) {
+			item.GetComponent<Candy> ().type = item.name;
+		}
+
+		for (int i = 0; i < bonusPrefabs.Length; i++) {
+			bonusPrefabs [i].GetComponent<Candy> ().type = candyPrefabs [i].name;
+		}
+
+	}
+
+	private void InstantiateAndPlaceNewCandy (int row, int column, GameObject newCandy) {
+
+		GameObject go = Instantiate(newCandy, bottomRight + new Vector2 (column * candySize.x, row * candySize.y), Quaternion.identity) as GameObject;
+
+		go.GetComponent<Candy> ().Initialize (newCandy.GetComponent<Candy> ().type, row, column);
+
+		candies [row, column] = go;
+
+	}
+
+	private void SetUpSpawnPositions () {
+
+		for (int column = 0; column < GameVariables.columns; column++) {
+			spawnPositions [column] = bottomRight + new Vector2 (column * candySize.x, GameVariables.rows * candySize.y);
+		}
+
+	}
+
+	private GameObject GetRandomCandy () {
+		return candyPrefabs [Random.Range (0, candyPrefabs.Length)];
+	}
+
+	private GameObject GetRandomExplosion () {
+		return explosionPrefabs [Random.Range (0, explosionPrefabs.Length)];
+	}
+
 }
